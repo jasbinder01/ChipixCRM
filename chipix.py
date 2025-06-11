@@ -6,12 +6,14 @@ from PIL import Image
 import re
 import csv
 from io import StringIO
+import os
 
 # ────────────────────────────────────────────────────────────────────────────────
 # 1. FIREBASE SETUP
 # ────────────────────────────────────────────────────────────────────────────────
 if not firebase_admin._apps:
-    cred = credentials.Certificate("chipixjson.json")
+    cred_path = os.path.join(os.path.dirname(__file__), "chipixjson.json")
+    cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
