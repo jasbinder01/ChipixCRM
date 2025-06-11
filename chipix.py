@@ -11,7 +11,7 @@ from io import StringIO
 # 1. FIREBASE SETUP
 # ────────────────────────────────────────────────────────────────────────────────
 if not firebase_admin._apps:
-    cred = credentials.Certificate("chipix.json")
+    cred = credentials.Certificate("chipixjson.json")
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
