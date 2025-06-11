@@ -69,8 +69,12 @@ with st.expander("➕ Add New Entry"):
                 "timestamp": datetime.now(),
                 **details
             }
-            customers_ref.add(entry)
-            st.success(f"✅ {entry_type} entry for {name} recorded.")
+            try:
+                customers_ref.add(entry)
+                st.success(f"✅ {entry_type} entry for {name} recorded.")
+            except Exception as e:
+                st.error("❌ Failed to add entry to Firestore.")
+                st.exception(e)
         else:
             st.error("❌ Please fill all required fields.")
 
@@ -78,10 +82,15 @@ with st.expander("➕ Add New Entry"):
 # 4. FETCH RECORDS
 # ────────────────────────────────────────────────────────────────────────────────
 def fetch_customers():
-    return [
-        {**doc.to_dict(), "id": doc.id}
-        for doc in customers_ref.order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
-    ]
+    try:
+        return [
+            {**doc.to_dict(), "id": doc.id}
+            for doc in customers_ref.order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
+        ]
+    except Exception as e:
+        st.error("❌ Failed to fetch records.")
+        st.exception(e)
+        return []
 
 # ────────────────────────────────────────────────────────────────────────────────
 # 5. SEARCH RECORDS & UPDATE STATUS
@@ -104,8 +113,12 @@ with st.expander("🔍 Search & Manage Customer"):
                                                    index=["Pending", "In Progress", "Completed"].index(r["status"]),
                                                    key=r["id"])
                     if new_status != r["status"]:
-                        customers_ref.document(r["id"]).update({"status": new_status})
-                        st.success(f"✅ Status updated for {r['name']}")
+                        try:
+                            customers_ref.document(r["id"]).update({"status": new_status})
+                            st.success(f"✅ Status updated for {r['name']}")
+                        except Exception as e:
+                            st.error("❌ Failed to update status.")
+                            st.exception(e)
         else:
             st.warning("No matching records found.")
 
@@ -114,7 +127,7 @@ with st.expander("🔍 Search & Manage Customer"):
 # ────────────────────────────────────────────────────────────────────────────────
 with st.expander("📤 Export Data"):
     export_data = fetch_customers()
-    if st.button("Download CSV"):
+    if st.button("Download CSV") and export_data:
         csv_buffer = StringIO()
         writer = csv.DictWriter(csv_buffer, fieldnames=export_data[0].keys())
         writer.writeheader()
