@@ -12,7 +12,7 @@ import os
 # 1. FIREBASE SETUP
 # ────────────────────────────────────────────────────────────────────────────────
 if not firebase_admin._apps:
-    cred_path = os.path.join(os.path.dirname(__file__), "chipixjson.json")
+    cred_path = os.path.join(os.path.dirname(__file__), "chipix.json")
     cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
 
